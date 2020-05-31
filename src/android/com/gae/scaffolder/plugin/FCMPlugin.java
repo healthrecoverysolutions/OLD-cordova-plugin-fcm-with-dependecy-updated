@@ -3,19 +3,12 @@ package com.gae.scaffolder.plugin;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.util.Log;
-import android.app.NotificationManager;
-import android.app.NotificationChannel;
-import android.content.Context;
-import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.O;
 
 import com.gae.scaffolder.plugin.interfaces.OnFinishedListener;
 import com.gae.scaffolder.plugin.interfaces.TokenListeners;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -32,13 +25,11 @@ import java.util.Map;
 
 public class FCMPlugin extends CordovaPlugin {
     public static CordovaWebView gWebView;
-    public static String notificationCallBack = "FCMPlugin.onNotificationReceived";
-    public static String tokenRefreshCallBack = "FCMPlugin.onTokenRefreshReceived";
-    public static Boolean notificationCallBackReady = false;
-    public static Map<String, Object> lastPush = null;
+    public static String notificationEventName = "notification";
+    public static String tokenRefreshEventName = "tokenRefresh";
+    public static Map<String, Object> initialPushPayload = null;
 
     protected Context context = null;
-    protected static OnFinishedListener<JSONObject> notificationFn = null;
     public static final String TAG = "FCMPlugin";
     private static CordovaPlugin instance = null;
 
@@ -80,6 +71,9 @@ public class FCMPlugin extends CordovaPlugin {
         super.initialize(cordova, webView);
         gWebView = webView;
         Log.d(TAG, "==> FCMPlugin initialize");
+
+        FirebaseMessaging.getInstance().subscribeToTopic("android");
+        FirebaseMessaging.getInstance().subscribeToTopic("all");
     }
 
     public boolean execute(final String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
@@ -98,26 +92,11 @@ public class FCMPlugin extends CordovaPlugin {
                     }
                 });
             }
-            // DELETE INSTANCE ID //
-            else if (action.equals("deleteInstanceId")) {
-                cordova.getThreadPool().execute(new Runnable() {
-
-                    public void run() {
-                        try {
-                            FirebaseInstanceId.getInstance().deleteInstanceId();
-                            callbackContext.success();
-                        } catch (Exception e) {
-                            callbackContext.error(e.getMessage());
-                        }
-                    }
-                });
-            }
-            // NOTIFICATION CALLBACK REGISTER //
-            else if (action.equals("registerNotification")) {
-                notificationCallBackReady = true;
+            // GET INITIAL PUSH PAYLOAD //
+            else if (action.equals("getInitialPushPayload")) {
                 cordova.getActivity().runOnUiThread(new Runnable() {
                     public void run() {
-                        registerNotification(callbackContext);
+                        getInitialPushPayload(callbackContext);
                     }
                 });
             }
@@ -138,29 +117,6 @@ public class FCMPlugin extends CordovaPlugin {
                     public void run() {
                         try {
                             FirebaseMessaging.getInstance().unsubscribeFromTopic(args.getString(0));
-                            callbackContext.success();
-                        } catch (Exception e) {
-                            callbackContext.error(e.getMessage());
-                        }
-                    }
-                });
-            } else if (action.equals("initDifferentAccount")) {
-                cordova.getThreadPool().execute(new Runnable() {
-                    public void run() {
-                        try {
-                            if (!FirebaseApp.getApps(context).isEmpty()) {
-                                FirebaseApp app = FirebaseApp.getInstance("[DEFAULT]");
-                                app.delete();
-                            }
-
-                            Context context = cordova.getActivity();
-                            JSONObject accountInfo = args.getJSONObject(0);
-                            FirebaseOptions options = new FirebaseOptions.Builder()
-                                    .setProjectId(accountInfo.getString("project_id"))
-                                    .setApplicationId(accountInfo.getString("app_id"))
-                                    .setApiKey(accountInfo.getString("api_key"))
-                                    .build();
-                            FirebaseApp.initializeApp(context, options);
                             callbackContext.success();
                         } catch (Exception e) {
                             callbackContext.error(e.getMessage());
@@ -199,20 +155,28 @@ public class FCMPlugin extends CordovaPlugin {
         return true;
     }
 
-    public void registerNotification(CallbackContext callbackContext) {
-        if (lastPush != null) FCMPlugin.sendPushPayload(lastPush);
-        lastPush = null;
-        callbackContext.success();
-    }
-
-    public void registerNotification(OnFinishedListener<JSONObject> callback) {
-        notificationFn = callback;
-        if (lastPush != null) FCMPlugin.sendPushPayload(lastPush);
-        lastPush = null;
-    }
-
-    public void onNotification(OnFinishedListener<JSONObject> callback) {
-        this.registerNotification(callback);
+    public void getInitialPushPayload(CallbackContext callback) {
+        if(initialPushPayload == null) {
+            Log.d(TAG, "getInitialPushPayload: null");
+            callback.success((String) null);
+            return;
+        }
+        Log.d(TAG, "getInitialPushPayload");
+        try {
+            JSONObject jo = new JSONObject();
+            for (String key : initialPushPayload.keySet()) {
+                jo.put(key, initialPushPayload.get(key));
+                Log.d(TAG, "\tinitialPushPayload: " + key + " => " + initialPushPayload.get(key));
+            }
+            callback.success(jo);
+        } catch(Exception error) {
+            try {
+                callback.error(exceptionToJson(error));
+            }
+            catch (JSONException jsonErr) {
+                Log.e(TAG, "Error when parsing json", jsonErr);
+            }
+        }
     }
 
     public void getToken(final TokenListeners<String, JSONObject> callback) {
@@ -282,9 +246,17 @@ public class FCMPlugin extends CordovaPlugin {
         });
     }
 
+    private static void dispatchJSEvent(String eventName, String jsData) throws Exception {
+        if (gWebView == null) {
+            throw new Exception("gWebView not available");
+        }
+        String callBack = "javascript:window.FCM.events.dispatchEvent(new CustomEvent(\"" + eventName + "\",{detail:" + jsData + "}))";
+        Log.d(TAG, "\tSent event: " + eventName + " with " + jsData);
+        gWebView.sendJavascript(callBack);
+    }
+
     public static void sendPushPayload(Map<String, Object> payload) {
         Log.d(TAG, "==> FCMPlugin sendPushPayload");
-        Log.d(TAG, "\tnotificationCallBackReady: " + notificationCallBackReady);
         Log.d(TAG, "\tgWebView: " + gWebView);
         try {
             JSONObject jo = new JSONObject();
@@ -292,39 +264,28 @@ public class FCMPlugin extends CordovaPlugin {
                 jo.put(key, payload.get(key));
                 Log.d(TAG, "\tpayload: " + key + " => " + payload.get(key));
             }
-            String callBack = "javascript:" + notificationCallBack + "(" + jo.toString() + ")";
-            if (notificationCallBackReady && gWebView != null) {
-                Log.d(TAG, "\tSent PUSH to view: " + callBack);
-                gWebView.sendJavascript(callBack);
-            } else {
-                Log.d(TAG, "\tView not ready. SAVED NOTIFICATION: " + callBack);
-                if (notificationFn != null) {
-                    notificationFn.success(jo);
-                    Log.i(TAG, "\tCalled java callback to get notification: with data:" + jo.toString());
-                }
-
-                lastPush = payload;
-            }
+            FCMPlugin.dispatchJSEvent(notificationEventName, jo.toString());
         } catch (Exception e) {
-            Log.d(TAG, "\tERROR sendPushToView. SAVED NOTIFICATION: " + e.getMessage());
-            lastPush = payload;
+            Log.d(TAG, "\tERROR sendPushPayload: " + e.getMessage());
+            if(initialPushPayload == null) {
+                initialPushPayload = payload;
+            }
         }
     }
 
     public static void sendTokenRefresh(String token) {
-        Log.d(TAG, "==> FCMPlugin sendRefreshToken");
+        Log.d(TAG, "==> FCMPlugin sendTokenRefresh");
         try {
-            String callBack = "javascript:" + tokenRefreshCallBack + "('" + token + "')";
-            gWebView.sendJavascript(callBack);
+            FCMPlugin.dispatchJSEvent(tokenRefreshEventName, "\"" + token + "\"");
         } catch (Exception e) {
-            Log.d(TAG, "\tERROR sendRefreshToken: " + e.getMessage());
+            Log.d(TAG, "\tERROR sendTokenRefresh: " + e.getMessage());
         }
     }
 
     @Override
     public void onDestroy() {
+        initialPushPayload = null;
         gWebView = null;
-        notificationCallBackReady = false;
     }
 
     protected Context getContext() {
