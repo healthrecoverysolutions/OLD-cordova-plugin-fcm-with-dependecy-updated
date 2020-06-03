@@ -17,7 +17,7 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="hrs-cordova-plugin-fcm-with-dependecy-updated" version="6.4.5">
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-fcm-with-dependecy-updated" version="7.0.0-beta.0">
 	<name>Cordova FCM Push Plugin</name>
 	<description>Google Firebase Cloud Messaging Cordova Push Plugin fork with dependecy updated</description>
 	<license>MIT</license>
@@ -34,7 +34,7 @@
 
 	<!-- ANDROID CONFIGURATION -->
 	<platform name="android">
-		<preference name="FCM_VERSION" default="23.0.0" />
+		<preference name="FCM_VERSION" default="19.0.0" />
 		<preference name="GRADLE_TOOLS_VERSION" default="3.5.3" />
 		<preference name="GOOGLE_SERVICES_VERSION" default="4.3.3" />
 		<preference name="SUPPORT_LIBRARY_VERSION" default="28.0.0" />
