@@ -15,8 +15,8 @@ Pod::Spec.new do |spec|
   #  summary should be tweet-length, and the description more in depth.
   #
 
-  spec.name         = "cordova-plugin-fcm-with-dependecy-updated"
-  spec.version      = "7.8.0"
+  spec.name         = "hrs-cordova-plugin-fcm-with-dependecy-updated"
+  spec.version      = "6.4.2"
   spec.summary      = "Google FCM Push Notifications Cordova Plugin"
 
   # This description is used to generate tags and improve search results.
@@ -28,7 +28,7 @@ Pod::Spec.new do |spec|
   Extremely easy plug&play push notification plugin for Cordova applications with Google Firebase FCM.
 DESC
 
-  spec.homepage     = "https://github.com/andrehtissot/cordova-plugin-fcm-with-dependecy-updated"
+  spec.homepage     = "https://github.com/joyceyhkim/cordova-plugin-fcm-with-dependecy-updated"
   # spec.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
 
@@ -79,7 +79,7 @@ DESC
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  spec.source       = { :git => "https://github.com/andrehtissot/cordova-plugin-fcm-with-dependecy-updated.git", :tag => "v#{spec.version}" }
+  spec.source       = { :git => "https://github.com/joyceyhkim/cordova-plugin-fcm-with-dependecy-updated.git", :tag => "v#{spec.version}" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -119,11 +119,11 @@ DESC
   #  the lib prefix of their name.
   #
 
-  # spec.frameworks  = "AddressBook", "Security", "UIKit"
+  spec.frameworks  = "AddressBook", "Security", "UIKit"
   # spec.framework  = "SomeFramework"
   # spec.frameworks = "SomeFramework", "AnotherFramework"
 
-  # spec.libraries   = "sqlite3", "z", "c++"
+  spec.libraries   = "sqlite3", "z", "c++"
   # spec.library   = "iconv"
   # spec.libraries = "iconv", "xml2"
 
@@ -140,6 +140,7 @@ DESC
   spec.dependency "Cordova", ">= 3.0.0"
 
   # TODO: Migrate to use Core cocoapods Firebase dependencies
-  spec.dependency 'Firebase/Messaging'
+  spec.dependency 'Firebase/Analytics', '~> 6.3.0'
+  spec.dependency 'Firebase/Messaging', '~> 6.3.0'
 
 end
