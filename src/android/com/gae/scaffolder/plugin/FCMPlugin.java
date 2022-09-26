@@ -9,7 +9,6 @@ import com.gae.scaffolder.plugin.interfaces.*;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -179,7 +178,7 @@ public class FCMPlugin extends CordovaPlugin {
 
     public void getToken(final TokenListeners<String, JSONObject> callback) {
         try {
-            FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+            FirebaseMessaging.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                 @Override
                 public void onComplete(Task<InstanceIdResult> task) {
                     if (!task.isSuccessful()) {
@@ -201,7 +200,7 @@ public class FCMPlugin extends CordovaPlugin {
                 }
             });
 
-            FirebaseInstanceId.getInstance().getInstanceId().addOnFailureListener(new OnFailureListener() {
+            FirebaseMessaging.getInstance().getInstanceId().addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(final Exception e) {
                     try {
@@ -224,7 +223,7 @@ public class FCMPlugin extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 try {
-                    FirebaseInstanceId.getInstance().deleteInstanceId();
+                    FirebaseMessaging.getInstance().deleteInstanceId();
                     callbackContext.success();
                 } catch (Exception e) {
                     callbackContext.error(e.getMessage());
