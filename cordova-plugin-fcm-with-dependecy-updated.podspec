@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   #
 
   spec.name         = "hrs-cordova-plugin-fcm-with-dependecy-updated"
-  spec.version      = "6.4.5"
+  spec.version      = "6.4.6"
   spec.summary      = "Google FCM Push Notifications Cordova Plugin"
 
   # This description is used to generate tags and improve search results.
@@ -104,7 +104,7 @@ DESC
   #  You can preserve files from being cleaned, please don't preserve
   #  non-essential files like tests, examples and documentation.
   #
-  
+
   # Reference: https://stackoverflow.com/questions/36797639/including-a-plist-file-with-my-cocoapod
   spec.resource_bundle  = {"GoogleService" => "src/ios/Assets/*" }
   # spec.resource  = "icon.png"
