@@ -93,6 +93,10 @@ var FCMPlugin = (function () {
     FCMPlugin.prototype.unsubscribeFromTopic = function (topic) {
         return execAsPromise('unsubscribeFromTopic', [topic]);
     };
+    // INITIALIZE A DIFFERENT FIREBASE ACCOUNT //
+    FCMPlugin.prototype.initDifferentAccount = function (accountInfo) {
+        return execAsPromise('initDifferentAccount', [accountInfo]);
+    }
     return FCMPlugin;
 }());
 
