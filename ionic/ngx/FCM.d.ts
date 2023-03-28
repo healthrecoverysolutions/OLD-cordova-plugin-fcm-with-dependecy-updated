@@ -117,7 +117,7 @@ export declare class FCM {
      */
     unsubscribeFromTopic(topic: string): Promise<void>;
 
-    initDifferentAccount(accountInfo: AccountInfo, success: () =>{}, error: (err) => {}): Promise<void>
+    initDifferentAccount(accountInfo: AccountInfo, success: () => void, error: (err) => void): Promise<void>
 }
 
 interface AccountInfo {
