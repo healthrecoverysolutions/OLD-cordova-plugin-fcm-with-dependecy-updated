@@ -67,6 +67,9 @@ FCM.prototype.subscribeToTopic = function (topic) {
 FCM.prototype.unsubscribeFromTopic = function (topic) {
     return window.FCM.unsubscribeFromTopic(topic)
 }
+FCM.prototype.initDifferentAccount = function (accountInfo, success, error) {
+    return window.FCM.initDifferentAccount(accountInfo, success, error)
+}
 FCM = __decorate(
     [
         Plugin({

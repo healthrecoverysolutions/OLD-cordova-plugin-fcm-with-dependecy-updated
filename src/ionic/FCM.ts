@@ -86,6 +86,21 @@ export class FCMPluginOnIonic {
     public unsubscribeFromTopic(topic: string): Promise<void> {
         return window.FCM.unsubscribeFromTopic(topic)
     }
+
+    public initDifferentAccount(accountInfo: AccountInfo, success: () => void, error: () => void): Promise<any> {
+        return window.FCM.initDifferentAccount(accountInfo, success, error)
+    }
+}
+
+export interface AccountInfo {
+    project_number: string;
+    database_url: string;
+    project_id: string;
+    storage_bucket: string;
+    app_id: string;
+    api_key: string;
+    package_name: string;
+    client_id: string;
 }
 
 export const FCM = new FCMPluginOnIonic()

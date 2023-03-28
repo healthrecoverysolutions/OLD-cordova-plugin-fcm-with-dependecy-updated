@@ -24,12 +24,14 @@ export declare class FCM {
     static getPluginRef: () => string;
     static getPluginInstallName: () => string;
     static getSupportedPlatforms: () => string[];
+
     /**
      * Removes existing push notifications from the notifications center
      *
      * @returns {Promise<void>} Async call to native implementation
      */
     clearAllNotifications(): Promise<void>;
+
     /**
      * For Android, some notification properties are only defined programmatically.
      * Channel can define the default behavior for notifications on Android 8.0+.
@@ -40,18 +42,21 @@ export declare class FCM {
      * @returns {Promise<void>} Async call to native implementation
      */
     createNotificationChannel(channelConfig: IChannelConfiguration): Promise<void>;
+
     /**
      * This method deletes the InstanceId, revoking all tokens.
      *
      * @returns {Promise<void>} Async call to native implementation
      */
     deleteInstanceId(): Promise<void>;
+
     /**
      * Gets ios device's current APNS token
      *
      * @returns {Promise<string>} Returns a Promise that resolves with the APNS token
      */
     getAPNSToken(): Promise<string>;
+
     /**
      * Retrieves the message that, on tap, opened the app
      *
@@ -60,12 +65,14 @@ export declare class FCM {
      * @returns {Promise<INotificationPayload | null>} Async call to native implementation
      */
     getInitialPushPayload(): Promise<INotificationPayload | null>;
+
     /**
      * Gets device's current registration id
      *
      * @returns {Promise<string>} Returns a Promise that resolves with the registration id token
      */
     getToken(): Promise<string>;
+
     /**
      * Checking for permissions.
      *
@@ -75,6 +82,7 @@ export declare class FCM {
      * - null: still not answered, recommended checking again later.
      */
     hasPermission(): Promise<boolean>;
+
     /**
      * Event firing when receiving new notifications
      *
@@ -84,6 +92,7 @@ export declare class FCM {
     onNotification(options?: {
         once?: boolean;
     }): Observable<INotificationPayload>;
+
     /**
      * Event firing when receiving a new Firebase token
      *
@@ -93,6 +102,7 @@ export declare class FCM {
     onTokenRefresh(options?: {
         once?: boolean;
     }): Observable<string>;
+
     /**
      * Request push notification permission, alerting the user if it not have yet decided
      *
@@ -100,6 +110,7 @@ export declare class FCM {
      * @returns {Promise<boolean>} Returns a Promise that resolves with the permission status
      */
     requestPushPermission(options?: IRequestPushPermissionOptions): Promise<boolean>;
+
     /**
      * Subscribes you to a [topic](https://firebase.google.com/docs/notifications/android/console-topics)
      *
@@ -108,6 +119,7 @@ export declare class FCM {
      * @returns {Promise<void>} Async call to native implementation
      */
     subscribeToTopic(topic: string): Promise<void>;
+
     /**
      * Unsubscribes you from a [topic](https://firebase.google.com/docs/notifications/android/console-topics)
      *
@@ -117,10 +129,10 @@ export declare class FCM {
      */
     unsubscribeFromTopic(topic: string): Promise<void>;
 
-    initDifferentAccount(accountInfo: AccountInfo, success: () => void, error: (err) => void): Promise<void>
+    initDifferentAccount(accountInfo: AccountInfo, success: () => void, error: () => void): Promise<any>
 }
 
-interface AccountInfo {
+export interface AccountInfo {
     project_number: string;
     database_url: string;
     project_id: string;
