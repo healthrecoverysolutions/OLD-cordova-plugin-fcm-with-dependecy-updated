@@ -5,6 +5,7 @@ import type { FCMPlugin } from '../../www/FCMPlugin'
 import type { IChannelConfiguration } from '../../www/IChannelConfiguration'
 import type { INotificationPayload } from '../../www/INotificationPayload'
 import type { IRequestPushPermissionOptions } from '../../www/IRequestPushPermissionOptions'
+import {AccountInfo} from '../FCM';
 
 declare namespace window {
     export let FCM: FCMPlugin
@@ -91,5 +92,9 @@ export class FCM {
     /** @copyFrom typings/FCMPlugin.d.ts FCMPlugin unsubscribeFromTopic */
     public unsubscribeFromTopic(topic: string): Promise<void> {
         return window.FCM.unsubscribeFromTopic(topic)
+    }
+
+    public initDifferentAccount(accountInfo: AccountInfo, success: () => void, error: () => void):  Promise<any> {
+        return window.FCM.initDifferentAccount(accountInfo, success, error);
     }
 }
