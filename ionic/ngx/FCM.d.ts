@@ -129,7 +129,7 @@ export declare class FCM {
      */
     unsubscribeFromTopic(topic: string): Promise<void>;
 
-    initDifferentAccount(accountInfo: AccountInfo, success: () => void, error: () => void): Promise<any>
+    initDifferentAccount(accountInfo: AccountInfo, success: () => void, error: (err) => void): Promise<any>
 }
 
 export interface AccountInfo {

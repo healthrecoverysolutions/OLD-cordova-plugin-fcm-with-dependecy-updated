@@ -87,7 +87,7 @@ export class FCMPluginOnIonic {
         return window.FCM.unsubscribeFromTopic(topic)
     }
 
-    public initDifferentAccount(accountInfo: AccountInfo, success: () => void, error: () => void): Promise<any> {
+    public initDifferentAccount(accountInfo: AccountInfo, success: () => void, error: (err) => void): Promise<any> {
         return window.FCM.initDifferentAccount(accountInfo, success, error)
     }
 }
